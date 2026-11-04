@@ -1,9 +1,10 @@
 # 공개 배포 및 유지
 
-- 공개 저장소: [MAKC-KR1/exam-codex-lite](https://github.com/MAKC-KR1/exam-codex-lite)
+- 공개 저장소: [MAKC-KR1/a1](https://github.com/MAKC-KR1/a1)
 - 소유 계정: MAKC-KR1
 - 공개 상태: Public
 - 공개 생성 확인일: 2026-11-04 (Asia/Seoul)
+- 프로젝트명: a1
 - 라이선스: MIT
 - 게시 범위: 일반 운영 지침·빈 양식·라이선스 12개 파일
 - 유지 기한: 2차 예선 결과 통지 전까지 공개 유지

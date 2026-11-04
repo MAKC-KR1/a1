@@ -1,18 +1,74 @@
-# Codex 실기시험 경량 준비물
+# a1 — Codex 실기시험 경량 준비물
 
 180분 서비스 개발 시험에서 **토큰 사용을 최소화하면서 필수 구현·검증·설명을 완료**하기 위한 짧은 지침과 빈 양식입니다. 시험 문제는 프로젝트 루트의 README.md로 제공된다는 조건을 전제로 합니다.
 
-**공개 저장소: [MAKC-KR1/exam-codex-lite](https://github.com/MAKC-KR1/exam-codex-lite)**. 배포 리비전과 공개 확인 기록은 [PUBLICATION.md](PUBLICATION.md)에 남깁니다. 외부 자료로 사용할 때는 상세 가이드의 허용 범위를 확인하고 실제 사용한 커밋을 기록하세요. 활용하는 저장소는 2차 예선 결과 통지 전까지 공개 상태를 유지해야 합니다.
+**공개 저장소: [MAKC-KR1/a1](https://github.com/MAKC-KR1/a1)**. 배포 리비전과 공개 확인 기록은 [PUBLICATION.md](PUBLICATION.md)에 남깁니다. 외부 자료로 사용할 때는 상세 가이드의 허용 범위를 확인하고 실제 사용한 커밋을 기록하세요. 활용하는 저장소는 2차 예선 결과 통지 전까지 공개 상태를 유지해야 합니다.
 
-## 시험에서 사용하는 최소 경로
+## 시험에서 사용하는 순서
 
-1. 상세 가이드에서 허용한 방식으로 공개 자료를 가져오고 저장소 URL·고정 커밋을 기록합니다.
-2. 제공된 Codex에서 실제 시험 프로젝트를 엽니다. Codex 업데이트 메시지가 나와도 제공된 버전을 유지합니다.
-3. [START_PROMPT.md](START_PROMPT.md)만 시작 메시지로 전달합니다. 이 README와 모든 양식을 AI에게 한꺼번에 읽히지 않습니다.
-4. `.exam/STATE.md`는 [양식](templates/STATE.md)에서 필요한 항목만 사용합니다. 새 파일 반입 방식이 제한되면 허용된 입력·메모 방식으로 같은 구조를 작성합니다.
-5. 다른 양식은 외부 자료를 사용할 때, 주요 작업을 기록할 때, 최종 설명을 준비할 때만 사용합니다.
+1. **실제 시험 작업공간의 절대 경로부터 지정합니다.** `EXAM_WORKSPACE`는 문제 `README.md`가 이미 있는 시험 프로젝트입니다. `A1_DIR`는 시험 프로젝트 바깥에 따로 둘, 이름이 `a1`인 허용된 도구 폴더입니다. 아래 예시를 실제 절대 경로로 바꾸고 끝의 `/`는 제외합니다. `A1_DIR`의 상위 폴더는 미리 존재해야 합니다.
 
-원본 문제 README.md와 기존 프로젝트 지침은 보존합니다. 이 패키지는 Python, 추가 설치, 외부 API 키, Codex 설정 변경을 요구하지 않습니다. 서비스 구현 코드·모의 정답·별도 모델 실행기는 포함하지 않습니다.
+   ```sh
+   EXAM_WORKSPACE="/실제/절대경로/exam-project"
+   A1_DIR="/실제/절대경로/allowed-tools/a1"
+   ```
+
+2. 상세 가이드가 허용한 방식으로 자료를 가져옵니다. **온라인 반입이 허용되고 Git이 제공되어 있을 때** 다음 명령을 사용합니다. 기존 `a1` 폴더에는 덮어쓰지 않습니다.
+
+   ```sh
+   if [ -d "$EXAM_WORKSPACE" ] && [ -f "$EXAM_WORKSPACE/README.md" ] &&
+      [ -d "${A1_DIR%/*}" ] && [ ! -e "$A1_DIR" ]; then
+     case "$EXAM_WORKSPACE:$A1_DIR" in
+       /*:/*/a1)
+         case "$A1_DIR" in
+           "$EXAM_WORKSPACE"/*) printf '%s\n' 'A1_DIR를 시험 프로젝트 밖에 지정하세요.' ;;
+           *) git clone https://github.com/MAKC-KR1/a1.git "$A1_DIR" ;;
+         esac ;;
+       *) printf '%s\n' '두 절대 경로와 a1 폴더 이름을 확인하세요.' ;;
+     esac
+   else
+     printf '%s\n' '시험 README, 도구 상위 폴더, 기존 a1 폴더를 확인하세요.'
+   fi
+   ```
+
+   온라인 사용이 불가능하면 **시험 규정이 승인한 ZIP 반입 방식**으로 동일한 공개 저장소 자료를 가져와 별도 `A1_DIR`에 풉니다. 압축 내부의 `README.md`가 `"$A1_DIR/README.md"`에 있어야 합니다. 시험 폴더에 압축을 풀거나 시험 README를 교체하지 않습니다. Git이나 다른 도구가 없으면 설치하지 말고 승인된 대안을 사용합니다.
+
+3. 실제 사용한 출처와 리비전을 기록합니다. Git으로 가져왔다면 아래 출력이 사용 리비전입니다. ZIP에는 `.git`이 없을 수 있으므로 다운로드한 실제 커밋·URL을 기록하고 확인할 수 없는 값은 미확인으로 남깁니다.
+
+   ```sh
+   if [ -d "$A1_DIR/.git" ]; then
+     git -C "$A1_DIR" rev-parse HEAD
+   else
+     printf '%s\n' 'ZIP의 다운로드 URL과 실제 대상 커밋을 확인해 기록하세요.'
+   fi
+   ```
+
+4. 허용된 경우 빈 양식만 시험 프로젝트의 `.exam`으로 복사합니다. 아래 명령은 기존 기록 파일을 보존합니다. 파일 반입이 제한되면 승인된 입력·메모 방식으로 필요한 항목만 작성합니다.
+
+   ```sh
+   if [ -d "$EXAM_WORKSPACE" ] && [ -f "$EXAM_WORKSPACE/README.md" ] &&
+      [ -d "$A1_DIR/templates" ]; then
+     if mkdir -p "$EXAM_WORKSPACE/.exam"; then
+       for name in STATE AI_USAGE SOURCES EXPLAIN; do
+         if [ -f "$A1_DIR/templates/$name.md" ] &&
+            [ ! -e "$EXAM_WORKSPACE/.exam/$name.md" ]; then
+           cp -n "$A1_DIR/templates/$name.md" "$EXAM_WORKSPACE/.exam/$name.md"
+         fi
+       done
+     fi
+   else
+     printf '%s\n' '시험 작업공간과 a1 양식 경로를 확인하세요.'
+   fi
+   ```
+
+5. 제공된 Codex에서 **`EXAM_WORKSPACE`의 실제 경로**를 엽니다. [START_PROMPT.md](START_PROMPT.md)의 경로 자리표시자를 실제 절대 경로로 바꿔 시작 메시지에 붙여 넣습니다. 읽어야 하는 문제는 `EXAM_WORKSPACE/README.md`이며 이 도구 저장소의 README가 아닙니다. START_PROMPT나 양식은 자동으로 읽힌다고 가정하지 않습니다. 이 README와 모든 양식을 한꺼번에 읽히지 않습니다.
+6. `.exam/STATE.md`에 현재 상태만 짧게 유지합니다. [SOURCES](templates/SOURCES.md)는 출처, [AI_USAGE](templates/AI_USAGE.md)는 주요 작업, [EXPLAIN](templates/EXPLAIN.md)은 최종 설명이 필요할 때 사용합니다.
+
+원본 문제 README.md와 기존 프로젝트 지침은 보존합니다. 제공된 Codex 버전을 그대로 유지하며 업데이트하지 않습니다. 이 패키지는 Python, 추가 설치, 외부 API 키, Codex 설정 변경을 요구하지 않으며 서비스 구현 코드·모의 정답·별도 모델 실행기를 포함하지 않습니다.
+
+## 담당자 확인이 필요할 때
+
+원문과 확인된 답변으로 결정할 수 없는 사항은 **질문 수·횟수 제한 없이 필요할 때 사용자에게 질문**합니다. 사용자가 담당자와 대화하고 실제 답변을 AI에게 전달합니다. AI가 담당자 답변을 만들어 내거나 추측으로 확정하지 않습니다. 답변이 필요한 모호한 작업은 보류하고, 기다리는 동안 확정된 독립 작업을 계속합니다. 받은 답변과 그에 따른 결정만 STATE에 짧게 남깁니다.
 
 ## 토큰을 줄이는 운영 규칙
 
@@ -20,7 +76,7 @@
 |---|---|
 | 여러 에이전트에 같은 명세·대화 복제 | 주 에이전트 1개가 기본. 독립 작업에만 보조 1개를 필요시 사용 |
 | 매번 전체 저장소 읽기 | 시작에 문제·실행 설정 파악, 이후 파일 검색과 관련 구간만 읽기 |
-| 장문 계획·보고·코드 재출력 | 한 작업씩 지시, 결과는 변경 파일·검증·다음 조치 5줄 내 |
+| 장문 계획·보고·코드 재출력 | 한 작업씩 지시, 일상 보고는 변경 파일·검증·다음 조치 5줄 내, 필요한 질문은 별도 |
 | 여러 문서를 매 작업마다 재생성 | STATE 한 파일의 변경된 항목만 갱신 |
 | 같은 오류에 무작정 재시도 | 재현 입력·실제 로그·관련 코드로 원인을 좁히기 |
 | 상시 리뷰·설명 에이전트 | 필요할 때 범위를 좁혀 검토하고, 최종 설명은 한 번 작성 |
