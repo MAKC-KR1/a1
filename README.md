@@ -4,65 +4,66 @@
 
 **공개 저장소: [MAKC-KR1/a1](https://github.com/MAKC-KR1/a1)**. 배포 리비전과 공개 확인 기록은 [PUBLICATION.md](PUBLICATION.md)에 남깁니다. 외부 자료로 사용할 때는 상세 가이드의 허용 범위를 확인하고 실제 사용한 커밋을 기록하세요. 활용하는 저장소는 2차 예선 결과 통지 전까지 공개 상태를 유지해야 합니다.
 
+## 프로젝트 디렉토리 구조
+
+시험 문제 `README.md`가 있는 **현재 프로젝트 루트에서** 이 저장소를 `a1/`로 가져옵니다. 별도 작업공간 경로 입력은 없습니다.
+
+```text
+현재 시험 프로젝트/
+├── README.md                 # 제공된 시험 문제 — 원문 보존
+├── AGENTS.md                 # 제공되어 있다면 기존 지침 유지
+├── src/                      # 서비스 구현: 새 프로젝트의 기본 위치
+├── tests/                    # 기능·경계·통합 검증: 새 프로젝트의 기본 위치
+├── .exam/                    # 실제 시험 작업 기록
+│   ├── STATE.md              # 요구사항, 질문·답변, 현재 작업, 결정
+│   ├── SOURCES.md            # 사용한 공개 자료와 커밋
+│   ├── AI_USAGE.md           # 주요 AI 활용과 사람의 확인
+│   ├── EXPLAIN.md            # 최종 설계 설명과 예상 질문 답변
+│   └── logs/                 # 필요한 상세 검증 로그만, 필요시 생성
+└── a1/                       # 이 공개 준비물 저장소
+    ├── README.md             # 준비물 사용법
+    ├── START_PROMPT.md       # 시험 시작 지침
+    ├── prompts/              # 필요할 때만 사용하는 작업·검토 지침
+    ├── templates/            # .exam으로 복사할 빈 양식
+    ├── LICENSE
+    ├── PUBLICATION.md
+    └── VALIDATION.md
+```
+
+`src/`, `tests/`는 기존 서비스 구조가 없는 경우의 기본안입니다. 제공된 프로젝트나 선택한 프레임워크가 `app/`, `pages/`, `backend/` 등 다른 구조를 사용하면 그대로 따르고 실제 위치만 STATE에 기록합니다. 기존 코드를 옮기거나 빈 폴더를 미리 모두 만들지 않습니다. `a1/`에는 시험 서비스 코드나 실제 기록을 작성하지 않습니다.
+
 ## 시험에서 사용하는 순서
 
-1. **실제 시험 작업공간의 절대 경로부터 지정합니다.** `EXAM_WORKSPACE`는 문제 `README.md`가 이미 있는 시험 프로젝트입니다. `A1_DIR`는 시험 프로젝트 바깥에 따로 둘, 이름이 `a1`인 허용된 도구 폴더입니다. 아래 예시를 실제 절대 경로로 바꾸고 끝의 `/`는 제외합니다. `A1_DIR`의 상위 폴더는 미리 존재해야 합니다.
+아래 명령은 시험 문제 `README.md`가 있는 현재 프로젝트 루트에서 실행합니다. 셸 예시는 bash/zsh 기준입니다.
+
+1. 상세 가이드가 허용한 방식으로 자료를 가져옵니다. 온라인 반입과 Git 사용이 허용되면 다음 명령을 실행합니다. 기존 `a1/`이 있으면 그 내용을 확인하고 사용합니다.
 
    ```sh
-   EXAM_WORKSPACE="/실제/절대경로/exam-project"
-   A1_DIR="/실제/절대경로/allowed-tools/a1"
+   git clone https://github.com/MAKC-KR1/a1.git a1
    ```
 
-2. 상세 가이드가 허용한 방식으로 자료를 가져옵니다. **온라인 반입이 허용되고 Git이 제공되어 있을 때** 다음 명령을 사용합니다. 기존 `a1` 폴더에는 덮어쓰지 않습니다.
+   네트워크가 차단돼 있으면 승인된 ZIP 반입 방식으로 현재 프로젝트 아래 `a1/`에 풉니다. 준비물 사용법은 `a1/README.md`, 시험 문제는 루트 `README.md`에 있어야 합니다.
+
+2. 빈 작업 양식을 준비합니다. `cp -n`은 기존 기록을 덮어쓰지 않습니다.
 
    ```sh
-   if [ -d "$EXAM_WORKSPACE" ] && [ -f "$EXAM_WORKSPACE/README.md" ] &&
-      [ -d "${A1_DIR%/*}" ] && [ ! -e "$A1_DIR" ]; then
-     case "$EXAM_WORKSPACE:$A1_DIR" in
-       /*:/*/a1)
-         case "$A1_DIR" in
-           "$EXAM_WORKSPACE"/*) printf '%s\n' 'A1_DIR를 시험 프로젝트 밖에 지정하세요.' ;;
-           *) git clone https://github.com/MAKC-KR1/a1.git "$A1_DIR" ;;
-         esac ;;
-       *) printf '%s\n' '두 절대 경로와 a1 폴더 이름을 확인하세요.' ;;
-     esac
-   else
-     printf '%s\n' '시험 README, 도구 상위 폴더, 기존 a1 폴더를 확인하세요.'
-   fi
+   mkdir -p .exam
+   cp -n a1/templates/*.md .exam/
    ```
 
-   온라인 사용이 불가능하면 **시험 규정이 승인한 ZIP 반입 방식**으로 동일한 공개 저장소 자료를 가져와 별도 `A1_DIR`에 풉니다. 압축 내부의 `README.md`가 `"$A1_DIR/README.md"`에 있어야 합니다. 시험 폴더에 압축을 풀거나 시험 README를 교체하지 않습니다. Git이나 다른 도구가 없으면 설치하지 말고 승인된 대안을 사용합니다.
+   새 파일 반입이 제한되면 허용된 입력·메모 방식으로 같은 항목을 기록합니다. `.exam/logs/`는 상세 로그를 보관할 필요가 생길 때 만듭니다.
 
-3. 실제 사용한 출처와 리비전을 기록합니다. Git으로 가져왔다면 아래 출력이 사용 리비전입니다. ZIP에는 `.git`이 없을 수 있으므로 다운로드한 실제 커밋·URL을 기록하고 확인할 수 없는 값은 미확인으로 남깁니다.
+3. 사용한 저장소 URL·커밋·파일·MIT 라이선스를 `.exam/SOURCES.md`에 기록합니다. Git으로 가져온 경우 실제 사용 리비전은 다음 명령으로 확인합니다.
 
    ```sh
-   if [ -d "$A1_DIR/.git" ]; then
-     git -C "$A1_DIR" rev-parse HEAD
-   else
-     printf '%s\n' 'ZIP의 다운로드 URL과 실제 대상 커밋을 확인해 기록하세요.'
-   fi
+   git -C a1 rev-parse HEAD
    ```
 
-4. 허용된 경우 빈 양식만 시험 프로젝트의 `.exam`으로 복사합니다. 아래 명령은 기존 기록 파일을 보존합니다. 파일 반입이 제한되면 승인된 입력·메모 방식으로 필요한 항목만 작성합니다.
+   ZIP에는 `.git`이 없을 수 있으므로 다운로드한 실제 커밋·URL을 기록합니다. 확인할 수 없는 값은 미확인으로 남깁니다.
 
-   ```sh
-   if [ -d "$EXAM_WORKSPACE" ] && [ -f "$EXAM_WORKSPACE/README.md" ] &&
-      [ -d "$A1_DIR/templates" ]; then
-     if mkdir -p "$EXAM_WORKSPACE/.exam"; then
-       for name in STATE AI_USAGE SOURCES EXPLAIN; do
-         if [ -f "$A1_DIR/templates/$name.md" ] &&
-            [ ! -e "$EXAM_WORKSPACE/.exam/$name.md" ]; then
-           cp -n "$A1_DIR/templates/$name.md" "$EXAM_WORKSPACE/.exam/$name.md"
-         fi
-       done
-     fi
-   else
-     printf '%s\n' '시험 작업공간과 a1 양식 경로를 확인하세요.'
-   fi
-   ```
-
-5. 제공된 Codex에서 **`EXAM_WORKSPACE`의 실제 경로**를 엽니다. [START_PROMPT.md](START_PROMPT.md)의 경로 자리표시자를 실제 절대 경로로 바꿔 시작 메시지에 붙여 넣습니다. 읽어야 하는 문제는 `EXAM_WORKSPACE/README.md`이며 이 도구 저장소의 README가 아닙니다. START_PROMPT나 양식은 자동으로 읽힌다고 가정하지 않습니다. 이 README와 모든 양식을 한꺼번에 읽히지 않습니다.
-6. `.exam/STATE.md`에 현재 상태만 짧게 유지합니다. [SOURCES](templates/SOURCES.md)는 출처, [AI_USAGE](templates/AI_USAGE.md)는 주요 작업, [EXPLAIN](templates/EXPLAIN.md)은 최종 설명이 필요할 때 사용합니다.
+4. 제공된 Codex를 **현재 시험 프로젝트 루트**에서 사용합니다. [START_PROMPT.md](START_PROMPT.md) 내용을 첫 메시지로 전달합니다. 작업공간 경로를 입력할 필요가 없습니다. 전체 준비물 README와 모든 양식을 매번 읽히지 않습니다.
+5. 필요한 확인은 사용자를 통해 담당자에게 요청합니다. 실제 답변과 구현 영향을 `.exam/STATE.md`에 기록하고 핵심 업무부터 구현·검증합니다.
+6. 마지막에 실제 코드·검증 결과로 `.exam/EXPLAIN.md`를 완성하고 시험이 지정한 방식으로 제출합니다. 제출용 Git에는 필요한 서비스 코드·기록만 선택해 추가하고, 별도 Git 저장소인 `a1/`을 서비스 코드와 함께 일괄 추가하지 않습니다. 기록의 제출 여부는 시험 지침을 따릅니다.
 
 원본 문제 README.md와 기존 프로젝트 지침은 보존합니다. 제공된 Codex 버전을 그대로 유지하며 업데이트하지 않습니다. 이 패키지는 Python, 추가 설치, 외부 API 키, Codex 설정 변경을 요구하지 않으며 서비스 구현 코드·모의 정답·별도 모델 실행기를 포함하지 않습니다.
 
